@@ -53,9 +53,11 @@
       contents = [];
       contents.push(document.createTextNode('Drag packs below to change priority, or drop a .zip to load new pack:'));
       selector = createSelector(this.game.materials.artPacks);
+      selector.container.style.margin = '5px';
       contents.push(selector.container);
       refreshButton = document.createElement('button');
-      refreshButton.textContent = 'Refresh';
+      refreshButton.textContent = 'Preview';
+      refreshButton.style.width = '100%';
       refreshButton.addEventListener('click', (function(_this) {
         return function(ev) {
           return _this.game.showAllChunks();
