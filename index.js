@@ -48,11 +48,22 @@
     __extends(APDialog, _super);
 
     function APDialog(game) {
-      var selector;
+      var contents, refreshButton, selector;
       this.game = game;
+      contents = [];
+      contents.push(document.createTextNode('Drag packs below to change priority, or drop a .zip to load new pack:'));
       selector = createSelector(this.game.materials.artPacks);
+      contents.push(selector.container);
+      refreshButton = document.createElement('button');
+      refreshButton.textContent = 'Refresh';
+      refreshButton.addEventListener('click', (function(_this) {
+        return function(ev) {
+          return _this.game.showAllChunks();
+        };
+      })(this));
+      contents.push(refreshButton);
       APDialog.__super__.constructor.call(this, game, {
-        contents: [selector.container],
+        contents: contents,
         escapeKeys: [192, 80]
       });
     }

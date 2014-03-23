@@ -23,7 +23,20 @@ class APPlugin
 class APDialog extends ModalDialog
   constructor: (@game) ->
 
+    contents = []
+
+    contents.push document.createTextNode('Drag packs below to change priority, or drop a .zip to load new pack:')
+
     selector = createSelector @game.materials.artPacks
+    contents.push selector.container
+
+    # refresh chunks to apply changes TODO: automatic? voxel-drop timeout, see https://github.com/deathcap/voxel-drop/issues/1
+    refreshButton = document.createElement('button')
+    refreshButton.textContent = 'Refresh'
+    refreshButton.addEventListener 'click', (ev) => @game.showAllChunks()
+
+    contents.push refreshButton
+
     super game,
-      contents: [selector.container]
+      contents: contents
       escapeKeys: [192, 80]  # `, P # TODO: match close key from binding
