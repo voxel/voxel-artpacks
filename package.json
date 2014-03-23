@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "voxel-modal-dialog": "^0.1.2",
-    "artpacks-ui": "git://github.com/deathcap/artpacks-ui.git#6584e4aaccb1968b8a9ade0447e488f78c7f305d"
+    "artpacks-ui": "^0.1.0"
   },
   "peerDependencies": {
   },
