@@ -1,0 +1,29 @@
+
+ModalDialog = require 'voxel-modal-dialog'
+createSelector = require 'artpacks-ui'
+
+module.exports = (game, opts) -> new APPlugin(game, opts)
+module.exports.pluginInfo =
+  clientOnly: true
+
+class APPlugin
+  constructor: (@game, opts) ->
+    throw 'voxel-artpacks requires game.materials with artPacks (voxel-texture-shader)' if not @game.materials?.artPacks?
+    throw 'voxel-artpacks requires game.buttons with kb-bindings' if not @game.buttons?.down?
+
+    @dialog = new APDialog @game
+    @enable()
+
+  enable: () ->
+    @game.buttons.down.on 'packs', @onDown = @dialog.open.bind(@dialog)
+
+  disable: () ->
+    @game.buttons.down.removeListener 'packs', @onDown if @onDown?
+
+class APDialog extends ModalDialog
+  constructor: (@game) ->
+
+    selector = createSelector @game.materials.artPacks
+    super game,
+      contents: [selector.container]
+      escapeKeys: [192, 80]  # `, P # TODO: match close key from binding
