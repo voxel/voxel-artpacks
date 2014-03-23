@@ -60,6 +60,12 @@
       refreshButton.style.width = '100%';
       refreshButton.addEventListener('click', (function(_this) {
         return function(ev) {
+          var i, old_names;
+          old_names = _this.game.materials.names;
+          _this.game.texture_opts.game = self.game;
+          i = 0;
+          _this.game.materials = _this.game.texture_modules[i](_this.game.texture_opts);
+          _this.game.materials.load(old_names);
           return _this.game.showAllChunks();
         };
       })(this));

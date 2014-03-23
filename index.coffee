@@ -35,7 +35,16 @@ class APDialog extends ModalDialog
     refreshButton = document.createElement('button')
     refreshButton.textContent = 'Preview'
     refreshButton.style.width = '100%'
-    refreshButton.addEventListener 'click', (ev) => @game.showAllChunks()
+    refreshButton.addEventListener 'click', (ev) =>
+      # reinitialize voxel-texture-shader TODO refactor
+      old_names = @game.materials.names
+      @game.texture_opts.game = self.game
+      i = 0
+      @game.materials = @game.texture_modules[i](@game.texture_opts)
+      @game.materials.load old_names
+
+      # refresh chunks
+      @game.showAllChunks()
 
     contents.push refreshButton
 
