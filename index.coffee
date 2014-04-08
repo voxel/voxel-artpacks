@@ -5,20 +5,21 @@ createSelector = require 'artpacks-ui'
 module.exports = (game, opts) -> new APPlugin(game, opts)
 module.exports.pluginInfo =
   clientOnly: true
+  loadAfter: ['voxel-keys']
 
 class APPlugin
   constructor: (@game, opts) ->
-    throw 'voxel-artpacks requires game.materials with artPacks (voxel-texture-shader)' if not @game.materials?.artPacks?
-    throw 'voxel-artpacks requires game.buttons with kb-bindings' if not @game.buttons?.down?
+    throw new Error('voxel-artpacks requires game.materials with artPacks (voxel-texture-shader)') if not @game.materials?.artPacks?
+    @keys = @game.plugins.get('voxel-keys') ? throw new Error('voxel-artpacks requires voxel-keys plugin')
 
     @dialog = new APDialog @game
     @enable()
 
   enable: () ->
-    @game.buttons.down.on 'packs', @onDown = @dialog.open.bind(@dialog)
+    @keys.down.on 'packs', @onDown = @dialog.open.bind(@dialog)
 
   disable: () ->
-    @game.buttons.down.removeListener 'packs', @onDown if @onDown?
+    @keys.down.removeListener 'packs', @onDown if @onDown?
 
 class APDialog extends ModalDialog
   constructor: (@game) ->

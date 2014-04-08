@@ -13,7 +13,8 @@
   };
 
   module.exports.pluginInfo = {
-    clientOnly: true
+    clientOnly: true,
+    loadAfter: ['voxel-keys']
   };
 
   APPlugin = (function() {
@@ -21,22 +22,26 @@
       var _ref, _ref1;
       this.game = game;
       if (((_ref = this.game.materials) != null ? _ref.artPacks : void 0) == null) {
-        throw 'voxel-artpacks requires game.materials with artPacks (voxel-texture-shader)';
+        throw new Error('voxel-artpacks requires game.materials with artPacks (voxel-texture-shader)');
       }
-      if (((_ref1 = this.game.buttons) != null ? _ref1.down : void 0) == null) {
-        throw 'voxel-artpacks requires game.buttons with kb-bindings';
-      }
+      this.keys = (function() {
+        if ((_ref1 = this.game.plugins.get('voxel-keys')) != null) {
+          return _ref1;
+        } else {
+          throw new Error('voxel-artpacks requires voxel-keys plugin');
+        }
+      }).call(this);
       this.dialog = new APDialog(this.game);
       this.enable();
     }
 
     APPlugin.prototype.enable = function() {
-      return this.game.buttons.down.on('packs', this.onDown = this.dialog.open.bind(this.dialog));
+      return this.keys.down.on('packs', this.onDown = this.dialog.open.bind(this.dialog));
     };
 
     APPlugin.prototype.disable = function() {
       if (this.onDown != null) {
-        return this.game.buttons.down.removeListener('packs', this.onDown);
+        return this.keys.down.removeListener('packs', this.onDown);
       }
     };
 
