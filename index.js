@@ -19,11 +19,13 @@
 
   APPlugin = (function() {
     function APPlugin(game, opts) {
-      var _ref, _ref1;
+      var bindKey, _ref, _ref1, _ref2;
       this.game = game;
-      if (((_ref = this.game.materials) != null ? _ref.artPacks : void 0) == null) {
-        throw new Error('voxel-artpacks requires game.materials with artPacks (voxel-texture-shader)');
-      }
+            if ((_ref = this.getArtpacks()) != null) {
+        _ref;
+      } else {
+        throw new Error('voxel-artpacks requires game.materials as voxel-texture-shader, or voxel-stitch');
+      };
       this.keys = (function() {
         if ((_ref1 = this.game.plugins.get('voxel-keys')) != null) {
           return _ref1;
@@ -31,7 +33,11 @@
           throw new Error('voxel-artpacks requires voxel-keys plugin');
         }
       }).call(this);
-      this.dialog = new APDialog(this.game);
+      bindKey = (_ref2 = opts.bindKey) != null ? _ref2 : (this.game.shell ? 'P' : false);
+      if (bindKey) {
+        this.game.shell.bind('packs', bindKey);
+      }
+      this.dialog = new APDialog(this, this.game);
       this.enable();
     }
 
@@ -45,6 +51,11 @@
       }
     };
 
+    APPlugin.prototype.getArtpacks = function() {
+      var _ref, _ref1, _ref2, _ref3;
+      return (_ref = (_ref1 = this.game.materials) != null ? _ref1.artPacks : void 0) != null ? _ref : (_ref2 = this.game.plugins) != null ? (_ref3 = _ref2.get('voxel-stitch')) != null ? _ref3.artpacks : void 0 : void 0;
+    };
+
     return APPlugin;
 
   })();
@@ -52,12 +63,13 @@
   APDialog = (function(_super) {
     __extends(APDialog, _super);
 
-    function APDialog(game) {
+    function APDialog(plugin, game) {
       var contents, refreshButton, selector;
+      this.plugin = plugin;
       this.game = game;
       contents = [];
       contents.push(document.createTextNode('Drag packs below to change priority, or drop a .zip to load new pack:'));
-      selector = createSelector(this.game.materials.artPacks);
+      selector = createSelector(this.plugin.getArtpacks());
       selector.container.style.margin = '5px';
       contents.push(selector.container);
       refreshButton = document.createElement('button');
