@@ -10,7 +10,7 @@
     "voxel"
   ],
   "dependencies": {
-    "voxel-modal-dialog": "^0.2.0",
+    "voxel-modal-dialog": "^0.2.1",
     "artpacks-ui": "^0.1.0"
   },
   "peerDependencies": {
