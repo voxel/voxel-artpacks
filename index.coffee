@@ -1,4 +1,3 @@
-
 ModalDialog = require 'voxel-modal-dialog'
 createSelector = require 'artpacks-ui'
 
@@ -47,8 +46,8 @@ class APDialog extends ModalDialog
       stitcher = @game.plugins.get('voxel-stitch')
       if stitcher?
         # game-shell/voxel-stitch - disable button while stitching in progress TODO: test this more
-        refreshButton.true = false
-        stitcher.on 'addedAll', () =>
+        refreshButton.disabled = true
+        stitcher.on 'addedAll', () ->
           refreshButton.disabled = false
         stitcher.stitch()
       else

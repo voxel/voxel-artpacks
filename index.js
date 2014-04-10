@@ -80,7 +80,7 @@
           var i, old_names, stitcher;
           stitcher = _this.game.plugins.get('voxel-stitch');
           if (stitcher != null) {
-            refreshButton["true"] = false;
+            refreshButton.disabled = true;
             stitcher.on('addedAll', function() {
               return refreshButton.disabled = false;
             });
