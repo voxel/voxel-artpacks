@@ -44,16 +44,24 @@ class APDialog extends ModalDialog
     refreshButton.textContent = 'Preview'
     refreshButton.style.width = '100%'
     refreshButton.addEventListener 'click', (ev) =>
-      # reinitialize voxel-texture-shader TODO refactor
-      # TODO: support game-shell/voxel-stitch
-      old_names = @game.materials.names
-      @game.texture_opts.game = self.game
-      i = 0
-      @game.materials = @game.texture_modules[i](@game.texture_opts)
-      @game.materials.load old_names
+      stitcher = @game.plugins.get('voxel-stitch')
+      if stitcher?
+        # game-shell/voxel-stitch - disable button while stitching in progress TODO: test this more
+        refreshButton.true = false
+        stitcher.on 'addedAll', () =>
+          refreshButton.disabled = false
+        stitcher.stitch()
+      else
+        # reinitialize voxel-texture-shader TODO refactor
+        # TODO: support game-shell/voxel-stitch
+        old_names = @game.materials.names
+        @game.texture_opts.game = self.game
+        i = 0
+        @game.materials = @game.texture_modules[i](@game.texture_opts)
+        @game.materials.load old_names
 
-      # refresh chunks
-      @game.showAllChunks()
+        # refresh chunks
+        @game.showAllChunks()
 
     contents.push refreshButton
 
