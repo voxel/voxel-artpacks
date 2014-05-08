@@ -14,7 +14,7 @@
 
   module.exports.pluginInfo = {
     clientOnly: true,
-    loadAfter: ['voxel-keys']
+    loadAfter: ['voxel-keys', 'voxel-stitch']
   };
 
   APPlugin = (function() {

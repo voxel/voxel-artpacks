@@ -4,7 +4,7 @@ createSelector = require 'artpacks-ui'
 module.exports = (game, opts) -> new APPlugin(game, opts)
 module.exports.pluginInfo =
   clientOnly: true
-  loadAfter: ['voxel-keys']
+  loadAfter: ['voxel-keys', 'voxel-stitch']
 
 class APPlugin
   constructor: (@game, opts) ->
