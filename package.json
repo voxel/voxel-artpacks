@@ -1,7 +1,7 @@
 {
   "name": "voxel-artpacks",
   "description": "artpack selector dialog (voxel.js plugin)",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "main": "artpacks-plugin.js",
   "repository": {
     "type": "git",
