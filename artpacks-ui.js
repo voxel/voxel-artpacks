@@ -1,69 +1,101 @@
-ModalDialog = require 'voxel-modal-dialog'
-createSelector = require 'artpacks-ui'
+'use strict';
 
-module.exports = (game, opts) -> new APPlugin(game, opts)
-module.exports.pluginInfo =
-  clientOnly: true
+const ModalDialog = require('voxel-modal-dialog');
+const createSelector = require('artpacks-ui');
+
+module.exports = (game, opts) => new APPlugin(game, opts);
+
+module.exports.pluginInfo = {
+  clientOnly: true,
   loadAfter: ['voxel-keys', 'voxel-stitch']
+};
 
-class APPlugin
-  constructor: (@game, opts) ->
-    @getArtpacks() ? throw new Error('voxel-artpacks requires game.materials as voxel-texture-shader, or voxel-stitch')
-    @keys = @game.plugins.get('voxel-keys') ? throw new Error('voxel-artpacks requires voxel-keys plugin')
+class APPlugin {
+  constructor(game, opts) {
+    this.game = game;
+    if (!this.getArtpacks()) throw new Error('voxel-artpacks requires game.materials as voxel-texture-shader, or voxel-stitch');
+    this.keys = this.game.plugins.get('voxel-keys');
+    if (!this.keys) throw new Error('voxel-artpacks requires voxel-keys plugin')
 
-    bindKey = opts.bindKey ? (if @game.shell then 'P' else false)
-    if bindKey
-      @game.shell.bind 'packs', bindKey
+    let bindKey = opts.bindKey;
+    if (bindKey === undefined) {
+      bindKey = (this.game.shell ? 'P' : false);
+    }
 
-    @dialog = new APDialog @, @game
-    @enable()
+    if (bindKey) {
+      this.game.shell.bind('packs', bindKey);
+    }
 
-  enable: () ->
-    @keys.down.on 'packs', @onDown = @dialog.open.bind(@dialog)
+    this.dialog = new APDialog(this, this.game);
+    this.enable();
+  }
 
-  disable: () ->
-    @keys.down.removeListener 'packs', @onDown if @onDown?
+  enable() {
+    this.keys.down.on('packs', this.onDown = this.dialog.open.bind(this.dialog));
+  }
 
-  getArtpacks: () ->
-    @game.materials?.artPacks ? @game.plugins?.get('voxel-stitch')?.artpacks
+  disable() {
+    if (this.onDown) this.keys.down.removeListener('packs', this.onDown);
+  }
 
-class APDialog extends ModalDialog
-  constructor: (@plugin, @game) ->
+  getArtpacks() {
+    if (this.game.materials && this.game.materials.artPacks) {
+      return this.game.materials.artPacks;
+    }
 
-    contents = []
+    if (this.game.plugins.get('voxel-stitch')) {
+        return this.game.plugins.get('voxel-stitch').artpacks;
+    }
 
-    contents.push document.createTextNode 'Drag packs below to change priority, or drop a .zip to load new pack:'
+    return undefined;
+  }
+}
 
-    selector = createSelector @plugin.getArtpacks()
-    selector.container.style.margin = '5px'
-    contents.push selector.container
+class APDialog extends ModalDialog {
+  constructor(plugin, game) {
+    super(game, {
+      contents: APDialog.generateContents(plugin, game),
+      escapeKeys: [192, 80]});  // `, P # TODO: match close key from binding
+  }
 
-    # refresh chunks to apply changes TODO: automatic? voxel-drop timeout, see https://github.com/deathcap/voxel-drop/issues/1
-    refreshButton = document.createElement('button')
-    refreshButton.textContent = 'Preview'
-    refreshButton.style.width = '100%'
-    refreshButton.addEventListener 'click', (ev) =>
-      stitcher = @game.plugins.get('voxel-stitch')
-      if stitcher?
-        # game-shell/voxel-stitch - disable button while stitching in progress TODO: test this more
-        refreshButton.disabled = true
-        stitcher.on 'addedAll', () ->
-          refreshButton.disabled = false
-        stitcher.stitch()
-      else
-        # reinitialize voxel-texture-shader TODO refactor
-        # TODO: support game-shell/voxel-stitch
-        old_names = @game.materials.names
-        @game.texture_opts.game = self.game
-        i = 0
-        @game.materials = @game.texture_modules[i](@game.texture_opts)
-        @game.materials.load old_names
+  static generateContents(plugin, game) {
+    const contents = [];
 
-        # refresh chunks
-        @game.showAllChunks()
+    contents.push(document.createTextNode('Drag packs below to change priority, or drop a .zip to load new pack:'));
 
-    contents.push refreshButton
+    const selector = createSelector(plugin.getArtpacks());
+    selector.container.style.margin = '5px';
+    contents.push(selector.container);
 
-    super game,
-      contents: contents
-      escapeKeys: [192, 80]  # `, P # TODO: match close key from binding
+    // refresh chunks to apply changes TODO: automatic? voxel-drop timeout, see https://github.com/deathcap/voxel-drop/issues/1
+    const refreshButton = document.createElement('button');
+    refreshButton.textContent = 'Preview';
+    refreshButton.style.width = '100%';
+    refreshButton.addEventListener('click', (ev) => {
+      const stitcher = game.plugins.get('voxel-stitch');
+      if (stitcher) {
+        // game-shell/voxel-stitch - disable button while stitching in progress TODO: test this more
+        refreshButton.disabled = true;
+        stitcher.on('addedAll', () => {
+          refreshButton.disabled = false;
+        });
+        stitcher.stitch();
+      } else {
+        // reinitialize voxel-texture-shader TODO refactor
+        // TODO: support game-shell/voxel-stitch
+        const old_names = game.materials.names;
+        game.texture_opts.game = self.game;
+        const i = 0;
+        game.materials = game.texture_modules[i](game.texture_opts)
+        game.materials.load(old_names);
+
+        // refresh chunks
+        game.showAllChunks();
+      }
+    });
+
+    contents.push(refreshButton);
+
+    return contents;
+  }
+}
