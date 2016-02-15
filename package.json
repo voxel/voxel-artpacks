@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "voxel-modal-dialog": "^0.2.1",
-    "artpacks-ui": "^0.1.0"
+    "artpacks-ui": "^1.0.0"
   },
   "peerDependencies": {},
   "license": "MIT"
