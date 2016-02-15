@@ -2,6 +2,7 @@
   "name": "voxel-artpacks",
   "description": "artpack selector dialog (voxel.js plugin)",
   "version": "0.1.2",
+  "main": "artpacks-plugin.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:deathcap/voxel-artpacks.git"
@@ -10,8 +11,8 @@
     "voxel"
   ],
   "dependencies": {
-    "voxel-modal-dialog": "^0.2.1",
-    "artpacks-ui": "^0.1.0"
+    "voxel-modal-dialog": "^1.0.0",
+    "artpacks-ui": "^1.0.0"
   },
   "peerDependencies": {},
   "license": "MIT"
